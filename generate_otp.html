@@ -1,0 +1,199 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generate OTP</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      background-color: WHITE;
+      text-align: center;
+      font-family: Arial, sans-serif;
+    }
+    body {
+      background: url('https://1.bp.blogspot.com/-c8R21J1ICrE/Xo3IU-19nmI/AAAAAAAAARY/YPyDsVoNz5gJuTbZ2N1nCU3rNUtkyxMagCLcBGAsYHQ/s1600/background_of_ui.jpg') no-repeat center;
+      background-size: cover;
+      font-family: sans-serif;
+    }
+    /* Panel styles */
+    .panel {
+      width: 50%;
+      margin: 50px auto;
+      background-color: #f8f8f8;
+      border-radius: 5px;
+      box-shadow: 0 0 5px #c5c5c5;
+    }
+    .panel-heading {
+      padding: 10px;
+      font-size: 24px;
+      font-weight: bold;
+      border-bottom: 1px solid #ccc;
+      background-color: #f5f5f5;
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
+    }
+    .panel-body {
+      padding: 20px;
+    }
+    /* Form styles */
+    .form-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      color: GREEN;
+    }
+    select,
+    input[type="text"] {
+      width: 50%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+      text-align: center;
+      color: PURPLE;
+    }
+    select:focus,
+    input[type="text"]:focus {
+      outline: none;
+      border-color: #007bff;
+    }
+    .btn {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-bottom: 30px;
+    }
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    /* Marquee styles */
+    marquee {
+      font-size: 20px;
+      color: #ff0000;
+      text-align: center;
+      padding: 10px 0;
+    }
+    #timer {
+      font-size: 25px;
+      cursor: pointer;
+      color: red;
+    }
+    #generated-otp {
+      font-size: 60px;
+      cursor: pointer;
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <div class="panel">
+    <div class="panel-heading">Generate OTP</div>
+    <div class="panel-body">
+      <form id="otp-form">
+        <div class="form-group">
+          <label for="section-selection">Select Section:</label>
+          <select id="section-selection" name="section">
+            <option value="A">A SECTION</option>
+            <option value="B">B SECTION</option>
+            <option value="C">C SECTION</option>
+            <option value="D">D SECTION</option>
+            <option value="E">E SECTION</option>
+            <option value="F">F SECTION</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="subject-selection">Select Subject:</label>
+          <select id="subject-selection" name="subject">
+            <option value="math">Subject 1</option>
+            <option value="B">Subject 2</option>
+            <option value="C">Subject 3</option>
+            <option value="D">Subject 4</option>
+            <option value="E">Subject 5</option>
+            <option value="F">Subject 6</option>
+          </select>
+        </div>
+        <button id="generate-otp-btn" class="btn">Generate OTP</button>
+        <div class="form-group">
+          <label for="generated-otp">GENERATED OTP:</label>
+          <div id="generated-otp" class="form-control otp"></div>
+        </div>
+        <div class="form-group">
+          <label for="timer">Timer:</label>
+          <div id="timer" class="form-control"></div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <marquee>THIS PAGE WILL AUTOMATICALLY REDIRECT TO THE MAIN PAGE. PLEASE DO NOT PRESS BACK OR REFRESH</marquee>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    const generateOtpBtn = document.getElementById("generate-otp-btn");
+    const generatedOtp = document.getElementById("generated-otp");
+    const timer = document.getElementById("timer");
+    const sectionSelection = document.getElementById("section-selection");
+    const subjectSelection = document.getElementById("subject-selection");
+
+    generateOtpBtn.addEventListener("click", function () {
+      generateOtpBtn.setAttribute("disabled", "disabled");
+
+      const otp = Math.floor(Math.random() * 1000000).toString().padStart(6, "0");
+      const formattedOtp = otp.match(/.{1,2}/g).join(" ");
+      generatedOtp.innerHTML = formattedOtp;
+
+      const xhr = new XMLHttpRequest();
+      const section = sectionSelection.value;
+      const subject = subjectSelection.value;
+
+      const params = {
+        otp: otp,
+        section: section,
+        subject: subject
+      };
+
+      xhr.open("POST", "/store-otp");
+      xhr.setRequestHeader("Content-Type", "application/json");
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+          if (xhr.status === 200) {
+            console.log("OTP stored successfully.");
+          } else {
+            console.error("Error storing OTP:", xhr.responseText);
+          }
+        }
+      };
+      xhr.send(JSON.stringify(params));
+
+      let timeLeft = 120;
+      timer.innerHTML = `${timeLeft} seconds`;
+
+      const countDown = setInterval(function () {
+        timeLeft--;
+        timer.innerHTML = `${timeLeft} seconds`;
+        if (timeLeft <= 0) {
+          clearInterval(countDown);
+          generatedOtp.innerHTML = "";
+          timer.innerHTML = "";
+          window.location.href = "https://www.example.com/";
+        }
+      }, 1000);
+    });
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,141 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="ENTER OTP.css">
+  </head>
+  <body>
+    <section>
+      <div class="container">
+        <h1 class="title">Enter OTP</h1>
+        <div id="subject-menu">
+          <label for="subject-select">Select a subject:</label>
+          <select id="subject-select">
+            <option value="math">Math</option>
+            <option value="science">Science</option>
+            <option value="english">English</option>
+            <option value="history">History</option>
+          </select>
+        </div>
+        <form id="otp-form">
+          <input type="text" class="otp-input filled" maxlength="1" />
+          <input type="text" class="otp-input filled" maxlength="1" />
+          <input type="text" class="otp-input filled" maxlength="1" />
+          <input type="text" class="otp-input filled" maxlength="1" />
+          <input type="text" class="otp-input filled" maxlength="1" />
+          <input type="text" class="otp-input filled" maxlength="1" />
+        </form>
+        <button id="verify-btn">MARK ATTENDANCE</button>
+        <button id="view-attendance-btn">VIEW PREVIOUS ATTENDANCE</button>
+      </div>
+    </section>
+
+    <script>
+      const form = document.querySelector("#otp-form");
+      const inputs = document.querySelectorAll(".otp-input");
+      const verifyBtn = document.querySelector("#verify-btn");
+
+      const isAllInputFilled = () => {
+        return Array.from(inputs).every((item) => item.value);
+      };
+
+      const getOtpText = () => {
+        let text = "";
+        inputs.forEach((input) => {
+          text += input.value;
+        });
+        return text;
+      };
+
+      const verifyOTP = () => {
+        if (isAllInputFilled()) {
+          const text = getOtpText();
+          const subject = document.querySelector("#subject-select").value;
+          const section = ""; // Add the section value here if available
+          const time = ""; // Add the time value here
+          const date = ""; // Add the date value here
+
+          const data = new URLSearchParams();
+          data.append("otp", text);
+          data.append("subject", subject);
+          data.append("section", section);
+          data.append("time", time);
+          data.append("date", date);
+
+          fetch("/verify_otp", {
+            method: "POST",
+            body: data,
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              alert(data.message);
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+            });
+        }
+      };
+
+      const toggleFilledClass = (field) => {
+        if (field.value) {
+          field.classList.add("filled");
+        } else {
+          field.classList.remove("filled");
+        }
+      };
+
+      form.addEventListener("input", (e) => {
+        const target = e.target;
+        const value = target.value;
+        toggleFilledClass(target);
+        if (target.nextElementSibling) {
+          target.nextElementSibling.focus();
+        }
+        verifyOTP();
+      });
+
+      inputs.forEach((input, currentIndex) => {
+        toggleFilledClass(input);
+
+        input.addEventListener("paste", (e) => {
+          e.preventDefault();
+          const text = e.clipboardData.getData("text");
+          inputs.forEach((item, index) => {
+            if (index >= currentIndex && text[index - currentIndex]) {
+              item.focus();
+              item.value = text[index - currentIndex] || "";
+              toggleFilledClass(item);
+              verifyOTP();
+            }
+          });
+        });
+
+        input.addEventListener("keydown", (e) => {
+          if (e.keyCode === 8) {
+            e.preventDefault();
+            input.value = "";
+            toggleFilledClass(input);
+            if (input.previousElementSibling) {
+              input.previousElementSibling.focus();
+            }
+          } else {
+            if (input.value && input.nextElementSibling) {
+              input.nextElementSibling.focus();
+            }
+          }
+        });
+      });
+
+      verifyBtn.addEventListener("click", () => {
+        verifyOTP();
+      });
+
+      // Get the "View Previous Attendance" button element
+      const viewAttendanceBtn = document.querySelector("#view-attendance-btn");
+
+      // Add an event listener to the button to handle the click event
+      viewAttendanceBtn.addEventListener("click", () => {
+        // Perform the desired action here, such as showing a list of previous attendance records
+        alert("View Previous Attendance button clicked!");
+      });
+    </script>
+  </body>
+</html>

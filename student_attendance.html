@@ -1,0 +1,180 @@
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        form {
+            margin: 20px auto;
+            width: 300px;
+            padding: 5px;
+        }
+
+        label {
+            text-align: center;
+            display: block;
+            margin-top: 10px;
+        }
+
+        span {
+            text-align: center;
+            display: block;
+            margin-top: 10px;
+            padding: 5px;
+            background-color: #da131300;
+            color: rgb(255, 162, 0);
+            border: none;
+            cursor: pointer;
+        }
+
+
+        select, input[type="date"], button {
+            width: 100%;
+            padding: 5px;
+            margin-top: 5px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .download-button {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+
+    <title>Student Attendance Tracking</title>
+
+    <script>
+        function toggleDateFields() {
+            var dateTypeSelect = document.getElementById("date_type");
+            var singleDateContainer = document.getElementById("single_date_container");
+            var dateRangeContainer = document.getElementById("date_range_container");
+
+            if (dateTypeSelect.value === "single_date") {
+                singleDateContainer.style.display = "block";
+                dateRangeContainer.style.display = "none";
+            } else if (dateTypeSelect.value === "date_range") {
+                singleDateContainer.style.display = "none";
+                dateRangeContainer.style.display = "block";
+            }
+        }
+
+        document.getElementById("date_type").addEventListener("change", function() {
+            toggleDateFields();
+            if (this.value === "single_date") {
+                document.getElementById("single_date_form").submit();
+            }
+
+            else if (this.value === "date_range") {
+                document.getElementById("date_range_form").submit();
+            }
+
+        });
+    </script>
+
+
+
+
+</head>
+
+<body>
+    <h1>Student Attendance Tracking</h1>
+    <form method="post" action="/attendance123">
+
+        <label for="reg_number">Registration Number:</label>
+        <span>{{ reg_number }}</span>
+        <input type="hidden" name="reg_number" value="{{ reg_number }}">
+        <br>
+
+
+
+        <label for="subject_id">Subject:</label>
+        <select name="subject_id" id="subject_id" required="">
+            <option disabled="" selected="">Select a subject</option>
+            <option value="2MAT11">Math</option>
+            <option value="Civ">Civ</option>
+            <option value="Eng">Eng</option>
+            <option value="Phy">Phy</option>
+            <option value="Ele">Ele</option>
+        </select>
+        <br>
+        
+        
+        
+        <label>Date:</label>
+        <select name="date_type" id="date_type" onchange="toggleDateFields()">
+            <option value="single_date" name="date_type">Single Date</option>
+            <option value="date_range" name="date_type">Date Range</option>
+        </select>
+        <br>
+        <div id="single_date_container">
+            <label for="single_date">Select Date:</label>
+            <input type="date" name="single_date" id="single_date" required="" pattern="\d{4}-\d{2}-\d{2}">
+            <input type="submit" style="display: none;">
+        </div>
+        <div id="date_range_container" style="display: none;">
+            <label for="start_date">Start Date:</label>
+            <input type="date" name="start_date" id="start_date" required="" pattern="\d{4}-\d{2}-\d{2}">
+            <label for="end_date">End Date:</label>
+            <input type="date" name="end_date" id="end_date" required="" pattern="\d{4}-\d{2}-\d{2}">
+        </div>
+        <br>
+        <button type="submit">Track Attendance</button>
+    </form>
+    
+    {% if attendance %}
+        <h2>Attendance Details</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Student ID</th>
+                    <th>Student Name</th>
+                    <th>Subject</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in attendance %}
+                    <tr>
+                        <td>{{ record.student_id }}</td>
+                        <td>{{ record.student_name }}</td>
+                        <td>{{ record.subject_id }}</td>
+                        <td>{{ record.date }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="download-button">
+            <a href="{{ url_for('studentattendance.download_studentattendance', subject_id=attendance[0].subject_id, date=attendance[0].date.strftime('%Y-%m-%d')) }}" download>Download Attendance</a>
+
+        </div>
+    {% endif %}
+</body>
+</html>
