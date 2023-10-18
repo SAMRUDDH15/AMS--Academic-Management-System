@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Page</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+</head>
+
+<body>
+  <div class="login-wrapper">
+    <form action="/login" method="POST" class="form">
+      <!-- Rest of the form -->
+      <div class="input-group">
+        <input type="text" name="loginUser" required placeholder="Registration Number">
+      </div>
+      <div class="input-group">
+        <input type="password" name="loginPass" required placeholder="Password">
+      </div>
+      <input type="submit" value="LOGIN" class="submit-btn">
+
+      {% if error_message %}
+      <p class="error-message">{{ error_message }}</p>
+      {% endif %}
+    </form>
+  </div>
+</body>
+
+</html>

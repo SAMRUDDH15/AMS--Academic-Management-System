@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>OTP Verification</title>
+  <style>
+
+
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-image: url("https://picstatio.com/download/1280x900/kn3yh1/abstract-water-flow-wallpaper.jpg"); /* Replace "your-image-url.jpg" with the URL of your image */
+    background-size: cover;
+    background-repeat: no-repeat;
+  }
+
+
+
+
+
+
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .otp-inputs {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+      padding: 5px;
+    }
+
+    input[type="text"] {
+      width: 40px;
+      height: 40px;
+      font-size: 20px;
+      text-align: center;
+      margin: 5px;
+    }
+
+    select {
+      width: 200px;
+      height: 40px;
+      font-size: 16px;
+      margin-bottom: 20px;
+      text-align: center;
+      background-color: rgba(54, 205, 216, 0);
+    }
+
+    button {
+      display: block;
+      margin: 0 auto;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: rgb(52, 205, 93);
+    }
+
+    @media only screen and (max-width: 600px) {
+      input[type="text"] {
+        width: 30px;
+        height: 30px;
+        font-size: 16px;
+        margin: 3px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Enter OTP</h1>
+  <form>
+    <div class="otp-inputs">
+      <input type="text" maxlength="1" oninput="nextInput(this)" required>
+      <input type="text" maxlength="1" oninput="nextInput(this)" required>
+      <input type="text" maxlength="1" oninput="nextInput(this)" required>
+      <input type="text" maxlength="1" oninput="nextInput(this)" required>
+      <input type="text" maxlength="1" oninput="nextInput(this)" required>
+      <input type="text" maxlength="1" oninput="nextInput(this)" required>
+    </div>
+    <select name="subject" required>
+      <option value="">Select a subject</option>
+      <option value="math">math</option>
+      <option value="science">Science</option>
+      <option value="english">English</option>
+      <option value="history">History</option>
+      <option value="geography">Geography</option>
+    </select>
+    <select name="section" required>
+      <option value="">Select a section</option>
+      <option value="A">Section A</option>
+      <option value="B">Section B</option>
+      <option value="C">Section C</option>
+      <option value="D">Section D</option>
+      <option value="E">Section E</option>
+    </select>
+    <button type="button" onclick="verifyOTP()">Verify OTP</button>
+  </form>
+
+  <script>
+    function nextInput(currentInput) {
+      var inputs = document.getElementsByTagName('input');
+
+      for (var i = 0; i < inputs.length; i++) {
+        if (inputs[i] === currentInput) {
+          if (currentInput.value) {
+            if (i < inputs.length - 1) {
+              inputs[i + 1].focus();
+            } else {
+              currentInput.blur(); // Unfocuses the last input field
+            }
+          } else {
+            if (i > 0) {
+              inputs[i - 1].focus();
+            }
+          }
+          break;
+        }
+      }
+    }
+
+    function verifyOTP() {
+      var inputs = document.getElementsByTagName('input');
+      var otp = Array.from(inputs).map(function (digit) {
+        return digit.value;
+      }).join('');
+      var selectedSubject = document.querySelector('select[name="subject"]').value;
+      var selectedSection = document.querySelector('select[name="section"]').value;
+      
+      // Create the request body
+      var data = new FormData();
+      data.append('otp', otp);
+      data.append('subject', selectedSubject);
+      data.append('section', selectedSection);
+
+      // Make an AJAX request to your backend API
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', '/verify_otp'); // Replace '/verify_otp' with your actual backend endpoint URL
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+          if (xhr.status === 200) {
+            var response = JSON.parse(xhr.responseText);
+            console.log(response);
+            // Process the response from the backend if needed
+          } else {
+            console.log('Request failed');
+            // Handle the error if needed
+          }
+        }
+      };
+      xhr.send(data);
+    }
+  </script>
+</body>
+</html>
