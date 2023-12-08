@@ -1,1 +1,1 @@
-# AMS-attendance-management-system-
+# AMS   Academic Management System
